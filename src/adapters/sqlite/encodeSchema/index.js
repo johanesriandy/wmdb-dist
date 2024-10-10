@@ -126,7 +126,7 @@ const encodeMakeColumnRequiredMigrationStep: (MakeColumnRequiredMigrationStep) =
   defaultValue,
   unsafeSql,
 }) => {
-  return (unsafeSql || identity)(`update table "${table}" set "${column}" = ${encodeValue(defaultValue)} where "${column}" = NULL`)
+  return (unsafeSql || identity)(`update "${table}" set "${column}" = ${encodeValue(defaultValue)} where "${column}" = NULL`)
 }
 
 const encodeDestroyTableMigrationStep: (DestroyTableMigrationStep) => SQL = ({

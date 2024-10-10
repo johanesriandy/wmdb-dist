@@ -114,7 +114,7 @@ var encodeMakeColumnRequiredMigrationStep = function ({
   defaultValue: defaultValue,
   unsafeSql: unsafeSql
 }) {
-  return (unsafeSql || identity)("update table \"".concat(table, "\" set \"").concat(column, "\" = ").concat((0, _encodeValue.default)(defaultValue), " where \"").concat(column, "\" = NULL"));
+  return (unsafeSql || identity)("update \"".concat(table, "\" set \"").concat(column, "\" = ").concat((0, _encodeValue.default)(defaultValue), " where \"").concat(column, "\" = NULL"));
 };
 var encodeDestroyTableMigrationStep = function ({
   table: table,
