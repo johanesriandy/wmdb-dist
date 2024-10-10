@@ -10,6 +10,8 @@ import type {
   DestroyTableMigrationStep,
   MakeColumnOptionalMigrationStep,
   MakeColumnRequiredMigrationStep,
+  AddColumnIndexMigrationStep,
+  RemoveColumnIndexMigrationStep,
 } from '../../../Schema/migrations'
 import type { SQL } from '../index'
 
@@ -126,7 +128,23 @@ const encodeMakeColumnRequiredMigrationStep: (MakeColumnRequiredMigrationStep) =
   defaultValue,
   unsafeSql,
 }) => {
-  return (unsafeSql || identity)(`update "${table}" set "${column}" = ${encodeValue(defaultValue)} where "${column}" = NULL`)
+  return (unsafeSql || identity)(`update "${table}" set "${column}" = ${encodeValue(defaultValue)} where "${column}" = NULL;`)
+}
+
+const encodeAddColumnIndexMigrationStep: (AddColumnIndexMigrationStep) => SQL = ({
+  table,
+  column,
+  unsafeSql
+}) => {
+  return (unsafeSql || identity)(`create index if not exists "${table}_${column}" on "${table}" ("${column}");`)
+}
+
+const encodeRemoveColumnIndexMigrationStep: (RemoveColumnIndexMigrationStep) => SQL = ({
+  table,
+  column,
+  unsafeSql
+}) => {
+  return (unsafeSql || identity)(`drop index if exists "${table}_${column}";`)
 }
 
 const encodeDestroyTableMigrationStep: (DestroyTableMigrationStep) => SQL = ({
@@ -152,9 +170,9 @@ export const encodeMigrationSteps: (MigrationStep[]) => SQL = (steps) =>
       } else if (step.type === 'make_column_required') {
         return encodeMakeColumnRequiredMigrationStep(step)
       } else if (step.type === 'add_column_index') {
-        return encodeMakeColumnRequiredMigrationStep(step)
+        return encodeAddColumnIndexMigrationStep(step)
       } else if (step.type === 'remove_column_index') {
-        return encodeMakeColumnRequiredMigrationStep(step)
+        return encodeRemoveColumnIndexMigrationStep(step)
       } else if (step.type === 'destroy_table') {
         return encodeDestroyTableMigrationStep(step)
       } else if (step.type === 'sql') {

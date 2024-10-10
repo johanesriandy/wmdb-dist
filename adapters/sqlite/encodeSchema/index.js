@@ -114,7 +114,21 @@ var encodeMakeColumnRequiredMigrationStep = function ({
   defaultValue: defaultValue,
   unsafeSql: unsafeSql
 }) {
-  return (unsafeSql || identity)("update \"".concat(table, "\" set \"").concat(column, "\" = ").concat((0, _encodeValue.default)(defaultValue), " where \"").concat(column, "\" = NULL"));
+  return (unsafeSql || identity)("update \"".concat(table, "\" set \"").concat(column, "\" = ").concat((0, _encodeValue.default)(defaultValue), " where \"").concat(column, "\" = NULL;"));
+};
+var encodeAddColumnIndexMigrationStep = function ({
+  table: table,
+  column: column,
+  unsafeSql: unsafeSql
+}) {
+  return (unsafeSql || identity)("create index if not exists \"".concat(table, "_").concat(column, "\" on \"").concat(table, "\" (\"").concat(column, "\");"));
+};
+var encodeRemoveColumnIndexMigrationStep = function ({
+  table: table,
+  column: column,
+  unsafeSql: unsafeSql
+}) {
+  return (unsafeSql || identity)("drop index if exists \"".concat(table, "_").concat(column, "\";"));
 };
 var encodeDestroyTableMigrationStep = function ({
   table: table,
@@ -137,9 +151,9 @@ var encodeMigrationSteps = exports.encodeMigrationSteps = function (steps) {
     } else if ('make_column_required' === step.type) {
       return encodeMakeColumnRequiredMigrationStep(step);
     } else if ('add_column_index' === step.type) {
-      return encodeMakeColumnRequiredMigrationStep(step);
+      return encodeAddColumnIndexMigrationStep(step);
     } else if ('remove_column_index' === step.type) {
-      return encodeMakeColumnRequiredMigrationStep(step);
+      return encodeRemoveColumnIndexMigrationStep(step);
     } else if ('destroy_table' === step.type) {
       return encodeDestroyTableMigrationStep(step);
     } else if ('sql' === step.type) {
