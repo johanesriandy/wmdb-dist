@@ -82,6 +82,10 @@ export type MigrationStep =
   | SqlMigrationStep
   | DestroyColumnMigrationStep
   | RenameColumnMigrationStep
+  | MakeColumnOptionalMigrationStep
+  | MakeColumnRequiredMigrationStep
+  | AddColumnIndexMigrationStep
+  | RemoveColumnIndexMigrationStep
   | DestroyTableMigrationStep
 
 type Migration = $RE<{
