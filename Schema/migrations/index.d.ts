@@ -161,7 +161,7 @@ export function makeColumnRequired({
   table: TableName<any>,
   column: ColumnName,
   defaultValue: any,
-  unsafeSql: (string) => string,
+  unsafeSql?: (string) => string,
 }>): MakeColumnRequiredMigrationStep
 
 export function addColumnIndex({ table, column, unsafeSql}: $Exact<{
