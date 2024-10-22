@@ -15,7 +15,7 @@ import type {
 } from '../../../Schema/migrations'
 import type { SQL } from '../index'
 
-import encodeValue from '../encodeValue'
+import encodeValue from '../encodeValue/index.js'
 
 const standardColumnsInsertSQL = `"id" primary key, "_changed", "_status"`
 const commonSchema =

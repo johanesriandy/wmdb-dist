@@ -6,7 +6,7 @@ exports.encodeCreateIndices = encodeCreateIndices;
 exports.encodeDropIndices = encodeDropIndices;
 exports.encodeSchema = exports.encodeMigrationSteps = void 0;
 var _RawRecord = require("../../../RawRecord");
-var _encodeValue = _interopRequireDefault(require("../encodeValue"));
+var _index = _interopRequireDefault(require("../encodeValue/index.js"));
 var standardColumnsInsertSQL = "\"id\" primary key, \"_changed\", \"_status\"";
 var commonSchema = 'create table "local_storage" ("key" varchar(16) primary key not null, "value" text not null);' + 'create index "local_storage_key_index" on "local_storage" ("key");';
 var encodeCreateTable = function ({
@@ -80,7 +80,7 @@ var encodeAddColumnsMigrationStep = function ({
 }) {
   return columns.map(function (column) {
     var addColumn = "alter table \"".concat(table, "\" add \"").concat(column.name, "\";");
-    var setDefaultValue = "update \"".concat(table, "\" set \"").concat(column.name, "\" = ").concat((0, _encodeValue.default)((0, _RawRecord.nullValue)(column)), ";");
+    var setDefaultValue = "update \"".concat(table, "\" set \"").concat(column.name, "\" = ").concat((0, _index.default)((0, _RawRecord.nullValue)(column)), ";");
     var addIndex = encodeIndex(column, table);
     return (unsafeSql || identity)(addColumn + setDefaultValue + addIndex);
   }).join('');
@@ -114,7 +114,7 @@ var encodeMakeColumnRequiredMigrationStep = function ({
   defaultValue: defaultValue,
   unsafeSql: unsafeSql
 }) {
-  return (unsafeSql || identity)("update \"".concat(table, "\" set \"").concat(column, "\" = ").concat((0, _encodeValue.default)(defaultValue), " where \"").concat(column, "\" = NULL;"));
+  return (unsafeSql || identity)("update \"".concat(table, "\" set \"").concat(column, "\" = ").concat((0, _index.default)(defaultValue), " where \"").concat(column, "\" = NULL;"));
 };
 var encodeAddColumnIndexMigrationStep = function ({
   table: table,

@@ -23,9 +23,11 @@ export type Operator =
   | 'includes'
 
 export type ColumnDescription = $RE<{ column: ColumnName; type?: symbol }>
+export type ValueDescription = $RE<{ value: Value }>
+export type NonNullValuesDescription = $RE<{ values: NonNullValues }>
 export type ComparisonRight =
-  | $RE<{ value: Value }>
-  | $RE<{ values: NonNullValues }>
+  | ValueDescription
+  | NonNullValuesDescription
   | ColumnDescription
 export type Comparison = $RE<{ operator: Operator; right: ComparisonRight; type?: symbol }>
 

@@ -415,6 +415,14 @@ var DatabaseDriver = exports.default = /*#__PURE__*/function () {
           _this3._executeDestroyColumnMigration(step);
         } else if ('rename_column' === step.type) {
           _this3._executeRenameColumnMigration(step);
+        } else if ('make_column_optional' === step.type) {
+          _this3._executeMakeColumnOptionalMigrationStep(step);
+        } else if ('make_column_required' === step.type) {
+          _this3._executeMakeColumnRequiredMigrationStep(step);
+        } else if ('add_column_index' === step.type) {
+          _this3._executeAddColumnIndexMigrationStep(step);
+        } else if ('remove_column_index' === step.type) {
+          _this3._executeRemoveColumnIndexMigrationStep(step);
         } else if ('destroy_table' === step.type) {
           _this3._executeDestroyTableMigration(step);
         } else if (!('sql' === step.type)) {
@@ -481,6 +489,35 @@ var DatabaseDriver = exports.default = /*#__PURE__*/function () {
     collection.findAndUpdate({}, function (record) {
       delete record[from];
     });
+  };
+  _proto._executeMakeColumnOptionalMigrationStep = function ({
+    table: table
+  }) {};
+  _proto._executeMakeColumnRequiredMigrationStep = function ({
+    table: table,
+    column: column,
+    defaultValue: defaultValue
+  }) {
+    var collection = this.loki.getCollection(table);
+    collection.findAndUpdate({}, function (record) {
+      if (record[column] === undefined || null === record[column]) {
+        record[column] = defaultValue;
+      }
+    });
+  };
+  _proto._executeAddColumnIndexMigrationStep = function ({
+    table: table,
+    column: column
+  }) {
+    var collection = this.loki.getCollection(table);
+    collection.ensureIndex(column);
+  };
+  _proto._executeRemoveColumnIndexMigrationStep = function ({
+    table: table,
+    column: column
+  }) {
+    var collection = this.loki.getCollection(table);
+    collection.removeIndex(column);
   };
   _proto._executeDestroyTableMigration = function ({
     table: table

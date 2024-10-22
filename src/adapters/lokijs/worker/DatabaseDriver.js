@@ -12,13 +12,15 @@ import type {
 } from '../../type'
 import type { TableName, AppSchema, SchemaVersion, TableSchema } from '../../../Schema'
 import type {
-  SchemaMigrations,
-  CreateTableMigrationStep,
+  MigrationStep,
   AddColumnsMigrationStep,
   DestroyColumnMigrationStep,
   RenameColumnMigrationStep,
   DestroyTableMigrationStep,
-  MigrationStep,
+  MakeColumnOptionalMigrationStep,
+  MakeColumnRequiredMigrationStep,
+  AddColumnIndexMigrationStep,
+  RemoveColumnIndexMigrationStep,
 } from '../../../Schema/migrations'
 import type { SerializedQuery } from '../../../Query'
 import type { RecordId } from '../../../Model'
@@ -397,6 +399,14 @@ export default class DatabaseDriver {
         this._executeDestroyColumnMigration(step)
       } else if (step.type === 'rename_column') {
         this._executeRenameColumnMigration(step)
+      } else if (step.type === 'make_column_optional') {
+        this._executeMakeColumnOptionalMigrationStep(step)
+      } else if (step.type === 'make_column_required') {
+        this._executeMakeColumnRequiredMigrationStep(step)
+      } else if (step.type === 'add_column_index') {
+        this._executeAddColumnIndexMigrationStep(step)
+      } else if (step.type === 'remove_column_index') {
+        this._executeRemoveColumnIndexMigrationStep(step)
       } else if (step.type === 'destroy_table') {
         this._executeDestroyTableMigration(step)
       } else if (step.type === 'sql') {
@@ -456,6 +466,32 @@ export default class DatabaseDriver {
       delete record[from]
     })
   }
+
+  _executeMakeColumnOptionalMigrationStep({ table, }: MakeColumnOptionalMigrationStep): void {}
+
+  _executeMakeColumnRequiredMigrationStep({table, column, defaultValue}: MakeColumnRequiredMigrationStep): void {
+    const collection = this.loki.getCollection(table)
+
+    collection.findAndUpdate({}, (record) => {
+      if (record[column] === undefined || record[column] === null) {
+        record[column] = defaultValue;
+      }
+    })
+  }
+  
+  _executeAddColumnIndexMigrationStep({table, column}: AddColumnIndexMigrationStep): void {
+    const collection = this.loki.getCollection(table)
+
+    collection.ensureIndex(column)
+  }
+
+  _executeRemoveColumnIndexMigrationStep({table, column}: RemoveColumnIndexMigrationStep): void {
+    const collection = this.loki.getCollection(table)
+
+    collection.removeIndex(column)
+
+  }
+
   _executeDestroyTableMigration({ table }: DestroyTableMigrationStep): void {
     const collection = this.loki.getCollection(table)
     if (collection) {
